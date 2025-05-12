@@ -1,43 +1,20 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 2025/05/12 16:23:15
--- Design Name: 
--- Module Name: mode - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
-entity mode is
---  Port ( );
+entity mode is 
+    Port (
+        btnc, btnd, btnl, btnr, btnu : in std_logic;
+        num_input : in std_logic_vector (15 downto 0);
+        cur_mode : out integer range 0 to 3;
+        num_display : out std_logic_vector (15 downto 0);
+        lock_start : out std_logic;
+        lock_end : in std_logic;
+        led : out std_logic_vector (2 downto 0)
+    );
 end mode;
 
 architecture Behavioral of mode is
 
 begin
-
 
 end Behavioral;
