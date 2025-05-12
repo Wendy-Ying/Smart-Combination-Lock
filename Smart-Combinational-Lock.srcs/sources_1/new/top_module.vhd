@@ -44,7 +44,7 @@ end top_module;
 
 architecture Behavioral of top_module is
     
-    -- TYPE state is (lock, unlock, set_pwd, check_pwd) , 0-3;
+    -- TYPE state is (lock, unlock, set_pwd, check_pwd), 0-3;
 
     component seven_segment_display is
         Port (
@@ -172,8 +172,5 @@ begin
         SEG => SEG,
         AN => AN
     );
-
-
-
 
 end Behavioral;
