@@ -75,6 +75,7 @@ architecture Behavioral of top_module is
 
     component mode is
         Port (
+            clk : in std_logic;
             btnc, btnd, btnl, btnr, btnu : in std_logic;
             num_input : in std_logic_vector (15 downto 0);
             cur_mode : out integer range 0 to 3;
@@ -138,6 +139,7 @@ begin
     );
 
     mode_inst : mode port map (
+        clk => CLK,
         btnc => BTNC_debounced,
         btnd => BTND_debounced,
         btnl => BTNL_debounced,

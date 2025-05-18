@@ -15,13 +15,15 @@ architecture Behavioral of timer is
 
     signal clock_divider : integer range 0 to 99999999 := 0;
     signal seconds_reg : integer range 0 to 59 := 0;
-    signal minutes_reg : integer range 0 to 59 := 2;
+    signal minutes_reg : integer range 0 to 59 := 0;
     signal timer_running : boolean := false;
 
     signal sec_tens : integer range 0 to 5 := 0;
     signal sec_units : integer range 0 to 9 := 0;
     signal min_tens : integer range 0 to 5 := 0;
     signal min_units : integer range 0 to 9 := 0;
+
+    signal lock_end_reg : std_logic := '1';
 
 begin
 
@@ -33,14 +35,14 @@ begin
                 seconds_reg <= 0;
                 minutes_reg <= 2;
                 timer_running <= true;
-                lock_end <= '0';
+                lock_end_reg <= '0';
             elsif timer_running then
                 if clock_divider = 99999999 then
                     clock_divider <= 0;
                     if seconds_reg = 0 then
                         if minutes_reg = 0 then
                             timer_running <= false;
-                            lock_end <= '1';
+                            lock_end_reg <= '1';
                         else
                             minutes_reg <= minutes_reg - 1;
                             seconds_reg <= 59;
@@ -66,5 +68,7 @@ begin
     lock_time(11 downto 8) <= std_logic_vector(to_unsigned(min_units, 4));
     lock_time(7 downto 4) <= std_logic_vector(to_unsigned(sec_tens, 4));
     lock_time(3 downto 0) <= std_logic_vector(to_unsigned(sec_units, 4));
+
+    lock_end <= lock_end_reg;
 
 end Behavioral;
