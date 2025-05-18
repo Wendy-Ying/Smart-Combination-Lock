@@ -36,6 +36,9 @@ entity top_module is
         CLK : in std_logic;
         SW : in std_logic_vector (15 downto 0);
         BTNC, BTNU, BTND, BTNL, BTNR : in std_logic;
+        rst : in std_logic;
+        rx : in std_logic;
+        tx : out std_logic;
         SEG : out  std_logic_vector (7 downto 0);
         AN : out  std_logic_vector (7 downto 0);
         LED : out std_logic_vector (2 downto 0)
@@ -75,6 +78,7 @@ architecture Behavioral of top_module is
 
     component mode is
         Port (
+            clk : in std_logic;
             btnc, btnd, btnl, btnr, btnu : in std_logic;
             num_input : in std_logic_vector (15 downto 0);
             cur_mode : out integer range 0 to 3;
@@ -94,6 +98,15 @@ architecture Behavioral of top_module is
             display_out : out std_logic_vector (31 downto 0)
         );
     end component display;
+
+    component bluetooth is 
+        Port (
+            CLK : in STD_LOGIC;
+            nRst : in STD_LOGIC;
+            tx : out STD_LOGIC;
+            rx : in STD_LOGIC
+        );
+    end component bluetooth;
 
     signal BTNC_debounced, BTNU_debounced, BTND_debounced, BTNL_debounced, BTNR_debounced : std_logic;
     
@@ -138,6 +151,7 @@ begin
     );
 
     mode_inst : mode port map (
+        clk => CLK,
         btnc => BTNC_debounced,
         btnd => BTND_debounced,
         btnl => BTNL_debounced,
@@ -171,6 +185,13 @@ begin
         number => display_out,
         SEG => SEG,
         AN => AN
+    );
+
+    blue_tooth_inst : bluetooth port map (
+        CLK => CLK,
+        nRst => rst,
+        tx => tx,
+        rx => rx
     );
 
 end Behavioral;
