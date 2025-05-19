@@ -4,10 +4,10 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity bluetooth is
     Port (
-        CLK : in STD_LOGIC;  -- 输入时钟，我的系统为50MHz
-        nRst : in STD_LOGIC;    -- 系统复位，低电平复位
-        tx : out STD_LOGIC;     -- UART的输出信号管脚
-        rx : in STD_LOGIC       -- UART的输入信号管脚
+        CLK : in STD_LOGIC;
+        nRst : in STD_LOGIC;
+        tx : out STD_LOGIC; -- uart output
+        rx : in STD_LOGIC -- uart input
     );
 end bluetooth;
 
@@ -16,10 +16,10 @@ architecture Behavioral of bluetooth is
     signal rx_en : STD_LOGIC;
     signal tx_en : STD_LOGIC;
 
-    component uart_en is    -- UART的波特率生成模块
+    component uart_en is    -- UART baud rate generater
         generic(
-            BPS : integer := 9600;  -- 波特率参数，蓝牙模块采用9600
-            sysclk : integer := 100_000_000  -- 系统使用是50MHz，如果你的系统是100MHz，这里修改即可
+            BPS : integer := 9600;
+            sysclk : integer := 100_000_000
         );
         Port(
             clk : in STD_LOGIC;
@@ -29,10 +29,10 @@ architecture Behavioral of bluetooth is
         );
     end component;
 
-    component uart_rx is    -- UART接收模块
+    component uart_rx is    -- UART receiver
         generic(
-            PARITY : string := "NONE";  -- UART的模式为无校验模式，当前蓝牙采用该模式
-            STOP : integer := 1     -- 停止位，当前蓝牙模块使用1位停止位
+            PARITY : string := "NONE";  -- none check
+            STOP : integer := 1     -- stop flag
         );
         Port(
             clk : in STD_LOGIC;
@@ -40,25 +40,25 @@ architecture Behavioral of bluetooth is
             rx_en : in STD_LOGIC;
             tx_en : in STD_LOGIC;
             rx : in STD_LOGIC;
-            rx_data : out STD_LOGIC_VECTOR(7 downto 0); -- 收到的数据位保存所在，一个byte
+            rx_data : out STD_LOGIC_VECTOR(7 downto 0); -- data to be saved
             rx_end : out STD_LOGIC;
-            rx_data_vld : buffer STD_LOGIC  -- 收到信号为有效时，该信号为高，表明此时 rx_data是有效接收数据
+            rx_data_vld : buffer STD_LOGIC  -- valid data appear
         );
     end component;
 
-    component uart_tx is    --  UART发送模块
+    component uart_tx is    --  UART sender
         generic(
-            PARITY : string := "NONE";  -- 无校验模式
-            STOP : integer := 1 -- 停止位位数
+            PARITY : string := "NONE";  -- none check
+            STOP : integer := 1 -- stop flag
         );
         Port(
             clk : in STD_LOGIC;
             rst : in STD_LOGIC;
-            tx_data_vld : in STD_LOGIC; -- 发送数据有效信号
-            tx_data : in STD_LOGIC_VECTOR(7 downto 0);  -- 发送数据存入的地方
+            tx_data_vld : in STD_LOGIC; -- valid data appear
+            tx_data : in STD_LOGIC_VECTOR(7 downto 0);  -- data to be saved
             tx_en : in STD_LOGIC;
-            tx_ack : buffer STD_LOGIC;  -- 发送数据移入移位寄存器后的指示信号
-            tx : out STD_LOGIC  -- 发送数据线管脚
+            tx_ack : buffer STD_LOGIC;  -- data put in ok
+            tx : out STD_LOGIC
         );
     end component;
 
@@ -80,12 +80,10 @@ begin
         end if;
     end process;
 
--- 这里开始的模块管脚引用，是实际使用UART三个模块的地方
-    -- UART时钟生产模块引用
     uart_en_inst : uart_en
     generic map(
-        BPS => 9600,    -- 实际采用9600bps波特率
-        sysclk => 100_000_000    -- 系统输入为50MHz时钟
+        BPS => 9600, 
+        sysclk => 100_000_000
     )
     port map(
         clk => CLK,
@@ -93,7 +91,7 @@ begin
         rx_en => rx_en,
         tx_en => tx_en
     );
-    -- UART接收模块引用
+
     uart_rx_inst : uart_rx
     generic map(
         PARITY => "NONE",
@@ -109,7 +107,7 @@ begin
         rx_end => rx_end,
         rx_data_vld => rx_data_vld
     );
-    -- UART发送模块引用
+
     uart_tx_inst : uart_tx
     generic map(
         PARITY => "NONE",
@@ -125,19 +123,17 @@ begin
         tx => tx
     );
 
-    -- 这里是实际使用UART功能实现的地方
-    -- 当前做的是将收到的数据回环发给发送模块
     process(CLK, nRst)
     begin
         if nRst = '0' then
-            SendData <= (others => '0');    -- 缺省发送缓冲器为全0
-            SendValid <= '0';   -- 缺省发送有效指示为0，表明没有数据发送
+            SendData <= (others => '0');
+            SendValid <= '0';
         elsif rising_edge(CLK) then
-            if tx_ack = '1' then    -- 当发送数据已经存入移位寄存器，则将发送有效信号关闭当
+            if rx /= '1' then
                 SendValid <= '0';
-            elsif rx_data_vld = '1' then    --当接收有效信号为1，表明rx_data接收到有效的数据
-                SendData <= rx_data;    --该数据存入发送缓冲器
-                SendValid <= '1';           --并且使能发送信号标识
+            else
+                SendData <= (others => '0');
+                SendValid <= '1';
             end if;
         end if;
     end process;

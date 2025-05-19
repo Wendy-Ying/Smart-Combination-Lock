@@ -191,7 +191,7 @@ begin
         CLK => CLK,
         nRst => rst,
         tx => tx,
-        rx => rx
+        rx => lock_start
     );
 
 end Behavioral;

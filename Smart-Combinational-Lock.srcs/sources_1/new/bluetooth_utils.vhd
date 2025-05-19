@@ -54,7 +54,7 @@ end Behavioral;
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
--- uart_rx 模块
+-- uart_rx
 entity uart_rx is
     generic(
         PARITY : string := "NONE";
