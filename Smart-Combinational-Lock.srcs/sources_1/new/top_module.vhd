@@ -108,6 +108,24 @@ architecture Behavioral of top_module is
         );
     end component bluetooth;
 
+    component encrypt is
+        Port (
+            clk : in STD_LOGIC;
+            plaintext : in STD_LOGIC_VECTOR(15 downto 0);
+            key : in STD_LOGIC_VECTOR(15 downto 0);
+            ciphertext : out STD_LOGIC_VECTOR(15 downto 0)
+        );
+    end component;
+
+    component decrypt is
+        Port (
+            clk : in STD_LOGIC;
+            ciphertext : in STD_LOGIC_VECTOR(15 downto 0);
+            key : in STD_LOGIC_VECTOR(15 downto 0);
+            plaintext : out STD_LOGIC_VECTOR(15 downto 0)
+        );
+    end component;
+
     signal BTNC_debounced, BTNU_debounced, BTND_debounced, BTNL_debounced, BTNR_debounced : std_logic;
     
     signal cur_mode : integer range 0 to 3;
@@ -118,6 +136,10 @@ architecture Behavioral of top_module is
     signal lock_time : std_logic_vector (15 downto 0);
 
     signal display_out : std_logic_vector (31 downto 0);
+
+    signal key : std_logic_vector (15 downto 0) := x"ABCD";
+    signal ciphertext : std_logic_vector (15 downto 0);
+    signal plaintext : std_logic_vector (15 downto 0);
 
 begin
     btnc_inst : btn_debounce port map (
@@ -157,7 +179,7 @@ begin
         btnl => BTNL_debounced,
         btnr => BTNR_debounced,
         btnu => BTNU_debounced,
-        num_input => SW,
+        num_input => plaintext,
         cur_mode => cur_mode,
         num_display => num_display,
         lock_start => lock_start,
@@ -192,6 +214,20 @@ begin
         nRst => rst,
         tx => tx,
         rx => lock_start
+    );
+
+    encrypt_inst : encrypt port map (
+        clk => CLK,
+        plaintext => SW,
+        key => key,
+        ciphertext => ciphertext
+    );
+
+    decrypt_inst : decrypt port map (
+        clk => CLK,
+        ciphertext => ciphertext,
+        key => key,
+        plaintext => plaintext
     );
 
 end Behavioral;

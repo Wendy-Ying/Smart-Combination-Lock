@@ -2,16 +2,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity FeistelEncrypt is
+entity encrypt is
     Port (
         clk : in STD_LOGIC;
         plaintext : in STD_LOGIC_VECTOR(15 downto 0);
         key : in STD_LOGIC_VECTOR(15 downto 0);
         ciphertext : out STD_LOGIC_VECTOR(15 downto 0)
     );
-end FeistelEncrypt;
+end encrypt;
 
-architecture Behavioral of FeistelEncrypt is
+architecture Behavioral of encrypt is
     constant NUM_ROUNDS : integer := 4;
 
     type left_array is array (0 to NUM_ROUNDS) of STD_LOGIC_VECTOR(7 downto 0);

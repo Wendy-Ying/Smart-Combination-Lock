@@ -2,16 +2,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity FeistelDecrypt is
+entity decrypt is
     Port (
-        clk        : in STD_LOGIC;
+        clk : in STD_LOGIC;
         ciphertext : in STD_LOGIC_VECTOR(15 downto 0);
-        key        : in STD_LOGIC_VECTOR(15 downto 0);
-        plaintext  : out STD_LOGIC_VECTOR(15 downto 0)
+        key : in STD_LOGIC_VECTOR(15 downto 0);
+        plaintext : out STD_LOGIC_VECTOR(15 downto 0)
     );
-end FeistelDecrypt;
+end decrypt;
 
-architecture Behavioral of FeistelDecrypt is
+architecture Behavioral of decrypt is
     constant NUM_ROUNDS : integer := 4;
 
     type round_array is array (0 to NUM_ROUNDS) of STD_LOGIC_VECTOR(7 downto 0);
