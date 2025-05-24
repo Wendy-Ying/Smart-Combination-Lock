@@ -41,7 +41,8 @@ entity top_module is
         tx : out std_logic;
         SEG : out  std_logic_vector (7 downto 0);
         AN : out  std_logic_vector (7 downto 0);
-        LED : out std_logic_vector (2 downto 0)
+        LED : out std_logic_vector (2 downto 0);
+        OUTBELL : out std_logic
     );
 end top_module;
 
@@ -85,7 +86,9 @@ architecture Behavioral of top_module is
             num_display : out std_logic_vector (15 downto 0);
             lock_start : out std_logic;
             lock_end : in std_logic;
-            led : out std_logic_vector (2 downto 0)
+            led : out std_logic_vector (2 downto 0);
+            buzzer_en : out std_logic;
+            buzzer_opt : out std_logic
         );
     end component mode;
 
@@ -126,6 +129,15 @@ architecture Behavioral of top_module is
         );
     end component;
 
+    component buzzer is
+        Port (
+            clk_in:in std_logic;
+            reset_in :in std_logic;
+            mode:in std_logic;
+            outbell:out std_logic
+        );
+    end component;
+
     signal BTNC_debounced, BTNU_debounced, BTND_debounced, BTNL_debounced, BTNR_debounced : std_logic;
     
     signal cur_mode : integer range 0 to 3;
@@ -140,6 +152,10 @@ architecture Behavioral of top_module is
     signal key : std_logic_vector (15 downto 0) := x"ABCD";
     signal ciphertext : std_logic_vector (15 downto 0);
     signal plaintext : std_logic_vector (15 downto 0);
+
+    signal buzzer_en : std_logic := '0';
+    signal buzzer_opt : std_logic := '0';
+    
 
 begin
     btnc_inst : btn_debounce port map (
@@ -179,19 +195,21 @@ begin
         btnl => BTNL_debounced,
         btnr => BTNR_debounced,
         btnu => BTNU_debounced,
-        num_input => plaintext,
+        num_input => ciphertext,
         cur_mode => cur_mode,
         num_display => num_display,
         lock_start => lock_start,
         lock_end => lock_end,
-        led => LED
+        led => LED,
+        buzzer_en => buzzer_en,
+        buzzer_opt => buzzer_opt
     );
 
     display_inst : display port map (
         clk => CLK,
         cur_mode => cur_mode,
         lock_time => lock_time,
-        num_display => num_display,
+        num_display => plaintext,
         display_out => display_out
     );
 
@@ -225,9 +243,16 @@ begin
 
     decrypt_inst : decrypt port map (
         clk => CLK,
-        ciphertext => ciphertext,
+        ciphertext => num_display,
         key => key,
         plaintext => plaintext
+    );
+
+    buzzer_inst: buzzer port map (
+        clk_in => CLK,
+        reset_in => buzzer_en,
+        mode => buzzer_opt,
+        outbell => OUTBELL
     );
 
 end Behavioral;

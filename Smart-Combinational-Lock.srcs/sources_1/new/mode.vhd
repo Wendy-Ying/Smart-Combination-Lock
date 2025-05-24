@@ -10,7 +10,9 @@ entity mode is
         cur_mode : out integer range 0 to 3;  -- TYPE state is (lock, unlock, set_pwd, check_pwd), 0-3;
         num_display : out std_logic_vector (15 downto 0);
         lock_start : out std_logic;
-        led : out std_logic_vector (2 downto 0)
+        led : out std_logic_vector (2 downto 0);
+        buzzer_en : out std_logic;
+        buzzer_opt : out std_logic
     );
 end mode;
 
@@ -40,8 +42,10 @@ begin
                 when 1 =>
                     if btnc = '1' and lock_end = '1' then
                         mode_reg <= 0;
+                        buzzer_en <= '0';
                     elsif btnl = '1' and lock_end = '1' then
                         mode_reg <= 2;
+                        buzzer_en <= '0';
                     end if;
                     led_reg <= "000";
 
@@ -53,28 +57,39 @@ begin
 
                 when 3 =>
                     if btnu = '1' and lock_end = '1' and check_pwd_result = '0' and check_pwd_acc_fault = 3 then -- fail last time and accumulate three times
+                        check_pwd_acc_fault <= 0;    
                         mode_reg <= 0;
                         lock_start_reg <= '1';
                         led_reg <= "000";
+                        buzzer_en <= '1';
+                        buzzer_opt <= '0';
                     elsif btnu = '1'and lock_end = '1' and check_pwd_result = '0' and check_pwd_acc_fault = 0 then
                         check_pwd_acc_fault <= 1;
                         mode_reg <= 3;
                         lock_start_reg <= '0';
                         led_reg <= "001";
+                        buzzer_en <= '1';
+                        buzzer_opt <= '0';
                     elsif btnu = '1'and lock_end = '1' and check_pwd_result = '0' and check_pwd_acc_fault = 1 then
                         check_pwd_acc_fault <= 2;
                         mode_reg <= 3;
                         lock_start_reg <= '0';
                         led_reg <= "011";
+                        buzzer_en <= '1';
+                        buzzer_opt <= '0';
                     elsif btnu = '1'and lock_end = '1' and check_pwd_result = '0' and check_pwd_acc_fault = 2 then
                         check_pwd_acc_fault <= 3;
                         mode_reg <= 3;
                         lock_start_reg <= '0';
                         led_reg <= "111";
+                        buzzer_en <= '1';
+                        buzzer_opt <= '0';
                     elsif btnu = '1' and lock_end = '1' and check_pwd_result = '1' then
                         mode_reg <= 1;
                         lock_start_reg <= '0';
                         led_reg <= "000";
+                        buzzer_en <= '1';
+                        buzzer_opt <= '1';
                     end if;
             end case;
         end if;
