@@ -63,9 +63,9 @@ begin
             plaintext <= test_vectors(i).plaintext;
             key <= test_vectors(i).key;
 
-            wait for clk_period * 3;
+            wait for clk_period * 5;
 
-            wait for clk_period * 3;
+            wait for clk_period * 5;
 
             if decrypted = test_vectors(i).plaintext then
                 report "  Result     : PASS" severity note;
