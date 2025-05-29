@@ -79,7 +79,7 @@ architecture Behavioral of uart_rx is
     signal rx_data_vld_rr : STD_LOGIC_VECTOR(1 downto 0) := "00";
     signal rx_data_r : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
     signal state : STD_LOGIC_VECTOR(3 downto 0) := "0000";
-    signal sample_cnt : integer range 0 to 7 := 0;
+    signal sample_cnt : integer range 0 to 255 := 0;
     signal odd : STD_LOGIC;
     signal rx_end_reg : STD_LOGIC_VECTOR(13 downto 0) := (others => '0');
 begin
